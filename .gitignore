@@ -1,0 +1,47 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+.env
+
+# other
+*.swp
+*.swo
+*.dylib
+*.DS_Store
+*.dSYM
+.lvimrc
+vgcore.*
+analysis.txt
+gmon.out
+compile_commands.json
+.cache
+build
