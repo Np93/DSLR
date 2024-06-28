@@ -21,6 +21,10 @@ cd votre_projet
 Utiliser les commande suivante pour tester chaque fonctionnaliter du projets, il faut bien sur entrainer le modele avant d'avoir une prediction.
 
 ```sh
+# pour installer les dependance de poetry commencer par:
+poetry install
+
+# ensuite:
 poetry run python3 scripts/describe.py data/dataset_train.csv
 poetry run python3 scripts/histogram.py
 poetry run python3 scripts/pair_plot.py
