@@ -1,6 +1,3 @@
-import pandas as pd
-import sys
-
 def manual_count(data):
     """
     Compte le nombre d'éléments dans une liste.
@@ -115,52 +112,37 @@ def manual_quantile(data, quantile):
     index = int(len(sorted_data) * quantile)
     return sorted_data[index]
 
-def describe_data(data_path):
+def calculate_bins(data, n_bins=10):
     """
-    Calcule et affiche des statistiques descriptives pour les données numériques d'un fichier CSV.
+    Calculer les bins de l'histogramme manuellement.
 
     Paramètres :
-    data_path (str) : Chemin vers le fichier CSV contenant les données.
+    data (list) : Liste des nombres.
+    n_bins (int) : Nombre de bins à calculer.
 
     Retourne :
-    None
+    list : Liste des bordures des bins.
     """
-    # Charger les données à partir du fichier CSV
-    df = pd.read_csv(data_path)
+    min_val = manual_min(data)
+    max_val = manual_max(data)
+    bin_width = (max_val - min_val) / n_bins if min_val != max_val else 1
+    return [min_val + i * bin_width for i in range(n_bins + 1)]
 
-    # Vérifier les colonnes entièrement NaN
-    if df.isna().all().any():
-        print("Error: One or more columns are fully NaN.")
-        return
+def assign_data_to_bins(data, bins):
+    """
+    Assigner les points de données aux bins pour l'histogramme.
 
-    # Sélectionner uniquement les colonnes numériques
-    num_df = df.select_dtypes(include=['float64', 'int64'])
+    Paramètres :
+    data (list) : Liste des nombres.
+    bins (list) : Liste des bordures des bins.
 
-    # Initialiser le dictionnaire pour les statistiques
-    stats = {'Feature': [], 'Count': [], 'Mean': [], 'Std': [], 'Min': [], '25%': [], '50%': [], '75%': [], 'Max': []}
-
-    # Calculer les statistiques pour chaque colonne numérique
-    for column in num_df.columns:
-        column_data = num_df[column].dropna().astype(float).tolist()
-        mean = manual_mean(column_data)
-        stats['Feature'].append(column)
-        stats['Count'].append(manual_count(column_data))
-        stats['Mean'].append(mean)
-        stats['Std'].append(manual_std(column_data, mean))
-        stats['Min'].append(manual_min(column_data))
-        stats['25%'].append(manual_quantile(column_data, 0.25))
-        stats['50%'].append(manual_quantile(column_data, 0.50))
-        stats['75%'].append(manual_quantile(column_data, 0.75))
-        stats['Max'].append(manual_max(column_data))
-
-    # Convertir les résultats en DataFrame pour un affichage formaté
-    result_df = pd.DataFrame(stats)
-    print(result_df.T)  # Transposé pour correspondre au format requis
-
-if __name__ == "__main__":
-    # Vérifier si le chemin vers le fichier de données est fourni en argument
-    if len(sys.argv) < 2:
-        print("Usage: python script_name.py path_to_data.csv")
-    else:
-        # Décrire les données du fichier CSV fourni
-        describe_data(sys.argv[1])
+    Retourne :
+    list : Liste des comptes de données dans chaque bin.
+    """
+    bin_counts = [0] * (len(bins) - 1)
+    for value in data:
+        for i, bin_edge in enumerate(bins):
+            if i > 0 and value <= bin_edge:
+                bin_counts[i - 1] += 1
+                break
+    return bin_counts

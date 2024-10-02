@@ -60,7 +60,7 @@ def plot_pair_matrix(dataset, columns=None):
             axs[i, j].set_yticks([])
     plt.show()
 
-if __name__ == "__main__":
+def main():
     # Charger les données à partir du fichier CSV
     df = load_data("data/dataset_train.csv")
     # Prétraiter les données
@@ -70,3 +70,6 @@ if __name__ == "__main__":
         plot_pair_matrix(cleaned_data)
     else:
         print("No valid data available for plotting after preprocessing.")
+
+if __name__ == "__main__":
+    main()

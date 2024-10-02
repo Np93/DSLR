@@ -1,6 +1,7 @@
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
+from dslr.utils import manual_min, manual_max, calculate_bins, assign_data_to_bins
 
 def load_data(filepath):
     """
@@ -29,76 +30,76 @@ def get_house_data(df, course):
     house_data = {house: df[(df['Hogwarts House'] == house) & df[course].notna()][course].tolist() for house in houses}
     return house_data
 
-def manual_sum(data):
-    """
-    Calculer la somme d'une liste de nombres.
+# def manual_sum(data):
+#     """
+#     Calculer la somme d'une liste de nombres.
 
-    Paramètres :
-    data (list) : Liste des nombres.
+#     Paramètres :
+#     data (list) : Liste des nombres.
 
-    Retourne :
-    float : Somme des nombres dans la liste.
-    """
-    return sum(data) if data else 0
+#     Retourne :
+#     float : Somme des nombres dans la liste.
+#     """
+#     return sum(data) if data else 0
 
-def manual_min(data):
-    """
-    Trouver la valeur minimale dans les données manuellement.
+# def manual_min(data):
+#     """
+#     Trouver la valeur minimale dans les données manuellement.
 
-    Paramètres :
-    data (list) : Liste des nombres.
+#     Paramètres :
+#     data (list) : Liste des nombres.
 
-    Retourne :
-    float : Valeur minimale dans la liste.
-    """
-    return min(data) if data else 0
+#     Retourne :
+#     float : Valeur minimale dans la liste.
+#     """
+#     return min(data) if data else 0
 
-def manual_max(data):
-    """
-    Trouver la valeur maximale dans les données manuellement.
+# def manual_max(data):
+#     """
+#     Trouver la valeur maximale dans les données manuellement.
 
-    Paramètres :
-    data (list) : Liste des nombres.
+#     Paramètres :
+#     data (list) : Liste des nombres.
 
-    Retourne :
-    float : Valeur maximale dans la liste.
-    """
-    return max(data) if data else 0
+#     Retourne :
+#     float : Valeur maximale dans la liste.
+#     """
+#     return max(data) if data else 0
 
-def calculate_bins(data, n_bins=10):
-    """
-    Calculer les bins de l'histogramme manuellement.
+# def calculate_bins(data, n_bins=10):
+#     """
+#     Calculer les bins de l'histogramme manuellement.
 
-    Paramètres :
-    data (list) : Liste des nombres.
-    n_bins (int) : Nombre de bins à calculer.
+#     Paramètres :
+#     data (list) : Liste des nombres.
+#     n_bins (int) : Nombre de bins à calculer.
 
-    Retourne :
-    list : Liste des bordures des bins.
-    """
-    min_val = manual_min(data)
-    max_val = manual_max(data)
-    bin_width = (max_val - min_val) / n_bins if min_val != max_val else 1
-    return [min_val + i * bin_width for i in range(n_bins + 1)]
+#     Retourne :
+#     list : Liste des bordures des bins.
+#     """
+#     min_val = manual_min(data)
+#     max_val = manual_max(data)
+#     bin_width = (max_val - min_val) / n_bins if min_val != max_val else 1
+#     return [min_val + i * bin_width for i in range(n_bins + 1)]
 
-def assign_data_to_bins(data, bins):
-    """
-    Assigner les points de données aux bins pour l'histogramme.
+# def assign_data_to_bins(data, bins):
+#     """
+#     Assigner les points de données aux bins pour l'histogramme.
 
-    Paramètres :
-    data (list) : Liste des nombres.
-    bins (list) : Liste des bordures des bins.
+#     Paramètres :
+#     data (list) : Liste des nombres.
+#     bins (list) : Liste des bordures des bins.
 
-    Retourne :
-    list : Liste des comptes de données dans chaque bin.
-    """
-    bin_counts = [0] * (len(bins) - 1)
-    for value in data:
-        for i, bin_edge in enumerate(bins):
-            if i > 0 and value <= bin_edge:
-                bin_counts[i - 1] += 1
-                break
-    return bin_counts
+#     Retourne :
+#     list : Liste des comptes de données dans chaque bin.
+#     """
+#     bin_counts = [0] * (len(bins) - 1)
+#     for value in data:
+#         for i, bin_edge in enumerate(bins):
+#             if i > 0 and value <= bin_edge:
+#                 bin_counts[i - 1] += 1
+#                 break
+#     return bin_counts
 
 def plot_manual_histogram(house_data, course, bins, house_colors):
     """
@@ -124,7 +125,7 @@ def plot_manual_histogram(house_data, course, bins, house_colors):
     plt.grid(True)
     plt.show()
 
-if __name__ == "__main__":
+def main():
     # Charger le fichier de données
     df = load_data("data/dataset_train.csv")
     
@@ -148,3 +149,6 @@ if __name__ == "__main__":
             plot_manual_histogram(house_data, course, bins, house_colors)
         else:
             print(f"No scores available for the course {course}. Cannot plot histogram.")
+
+if __name__ == "__main__":
+    main()

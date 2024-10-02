@@ -25,13 +25,13 @@ Utiliser les commande suivante pour tester chaque fonctionnaliter du projets, il
 poetry install
 
 # ensuite:
-poetry run python3 scripts/describe.py data/dataset_train.csv
-poetry run python3 scripts/histogram.py
-poetry run python3 scripts/pair_plot.py
-poetry run python3 scripts/scatter_plot.py
+poetry run python3 dslr/scripts/describe.py data/dataset_train.csv
+poetry run python3 dslr/scripts/histogram.py
+poetry run python3 dslr/scripts/pair_plot.py
+poetry run python3 dslr/scripts/scatter_plot.py
 
-poetry run python3 models/logreg_train.py data/dataset_train.csv
-poetry run python3 models/logreg_predict.py data/dataset_train.csv trained_weights.json
+poetry run python3 dslr/models/logreg_train.py data/dataset_train.csv
+poetry run python3 dslr/models/logreg_predict.py data/dataset_train.csv trained_weights.json
 ```
 
 ## Fonctionnalités

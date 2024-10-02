@@ -88,7 +88,7 @@ def plot_similar_features(dataset, feature1, feature2):
     plt.colorbar(label='Red: feature1 > feature2, Blue: feature2 >= feature1')
     plt.show()
 
-if __name__ == "__main__":
+def main():
     # Charger les données à partir du fichier CSV
     dataset = load_data("data/dataset_train.csv")
     # Identifier les colonnes numériques
@@ -102,3 +102,6 @@ if __name__ == "__main__":
         plot_similar_features(dataset, *most_correlated_pair)
     else:
         print("No sufficiently correlated features found to plot.")
+
+if __name__ == "__main__":
+    main()
