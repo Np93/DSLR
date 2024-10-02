@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd
 import sys
 import json
+from typing import List, Tuple, Dict
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
-def manual_median(data):
+def manual_median(data: List[float]) -> float:
     """
     Calculer la médiane manuellement.
 
@@ -27,7 +28,7 @@ def manual_median(data):
     return median
 
 class LogisticRegressionOVR_train:
-    def __init__(self, eta=5e-5, n_iter=10000, lambda_=0.01):
+    def __init__(self, eta: float = 5e-5, n_iter: int = 10000, lambda_: float = 0.01) -> None:
         """
         Initialiser le modèle de régression logistique one-vs-all.
 
@@ -41,7 +42,7 @@ class LogisticRegressionOVR_train:
         self.lambda_ = lambda_
         self.label_encoder = LabelEncoder()
 
-    def preprocess_data(self, filepath):
+    def preprocess_data(self, filepath: str) -> Tuple[np.ndarray, np.ndarray, List[str]]:
         """
         Prétraiter les données en chargeant le fichier CSV et en traitant les caractéristiques numériques.
 
@@ -57,7 +58,7 @@ class LogisticRegressionOVR_train:
         y = self.label_encoder.fit_transform(data['Hogwarts House'])  # Encoder les étiquettes des classes
         return X.values, y, self.label_encoder.classes_
 
-    def sigmoid(self, z):
+    def sigmoid(self, z: np.ndarray) -> np.ndarray:
         """
         Calculer la fonction sigmoïde.
 
@@ -69,7 +70,7 @@ class LogisticRegressionOVR_train:
         """
         return 1 / (1 + np.exp(-z))
 
-    def compute_cost(self, X, y, weights):
+    def compute_cost(self, X: np.ndarray, y: np.ndarray, weights: np.ndarray) -> Tuple[float, np.ndarray]:
         """
         Calculer le coût et le gradient pour la régression logistique.
 
@@ -90,7 +91,7 @@ class LogisticRegressionOVR_train:
         gradient = np.dot(X.T, h - y) / m + (self.lambda_ / m) * weights  # Gradient avec régularisation L2
         return cost, gradient
 
-    def train_logistic_regression(self, X, y):
+    def train_logistic_regression(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """
         Entraîner le modèle de régression logistique en utilisant la descente de gradient.
 
@@ -112,7 +113,7 @@ class LogisticRegressionOVR_train:
                 break
         return weights
 
-    def fit(self, filepath):
+    def fit(self, filepath: str) -> Dict[str, List[float]]:
         """
         Entraîner le modèle pour chaque classe en utilisant l'approche one-vs-all.
 

@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
-import sys
 import json
+import sys
+from typing import List, Tuple
 
 class LogisticRegressionOVR_predict:
-    def __init__(self, eta=5e-5, n_iter=30000):
+    def __init__(self, eta: float = 5e-5, n_iter: int = 30000) -> None:
         """
         Initialiser le modèle de régression logistique one-vs-all.
 
@@ -15,7 +16,7 @@ class LogisticRegressionOVR_predict:
         self.eta = eta
         self.n_iter = n_iter
 
-    def _scaling(self, X):
+    def _scaling(self, X: np.ndarray) -> np.ndarray:
         """
         Standardiser les caractéristiques.
 
@@ -28,7 +29,7 @@ class LogisticRegressionOVR_predict:
         # Calculer la moyenne et l'écart type pour chaque colonne et standardiser les données
         return (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 
-    def _processing(self, hptest):
+    def _processing(self, hptest: pd.DataFrame) -> np.ndarray:
         """
         Sélectionner et traiter les caractéristiques numériques à partir de la 6ème colonne.
 
@@ -46,7 +47,7 @@ class LogisticRegressionOVR_predict:
         hp_features = self._scaling(hp_features)
         return hp_features
 
-    def _predict_one(self, x, weights):
+    def _predict_one(self, x: np.ndarray, weights: List[Tuple[np.ndarray, int]]) -> int:
         """
         Calculer les prédictions pour une instance.
 
@@ -61,7 +62,7 @@ class LogisticRegressionOVR_predict:
         # Retourner la classe avec la valeur maximale
         return max((np.dot(x, w), c) for w, c in weights)[1]
 
-    def predict(self, hptest, weights):
+    def predict(self, hptest: pd.DataFrame, weights: List[Tuple[np.ndarray, int]]) -> List[int]:
         """
         Prédire les classes pour les données de test.
 
