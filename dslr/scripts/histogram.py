@@ -1,9 +1,10 @@
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
+from typing import List, Dict
 from dslr.utils import manual_min, manual_max, calculate_bins, assign_data_to_bins
 
-def load_data(filepath):
+def load_data(filepath: str) -> pd.DataFrame:
     """
     Charger les données à partir d'un fichier CSV.
 
@@ -15,7 +16,7 @@ def load_data(filepath):
     """
     return pd.read_csv(filepath)
 
-def get_house_data(df, course):
+def get_house_data(df: pd.DataFrame, course: str) -> Dict[str, List[float]]:
     """
     Collecter les données pour chaque maison pour un cours spécifique.
 
@@ -30,78 +31,7 @@ def get_house_data(df, course):
     house_data = {house: df[(df['Hogwarts House'] == house) & df[course].notna()][course].tolist() for house in houses}
     return house_data
 
-# def manual_sum(data):
-#     """
-#     Calculer la somme d'une liste de nombres.
-
-#     Paramètres :
-#     data (list) : Liste des nombres.
-
-#     Retourne :
-#     float : Somme des nombres dans la liste.
-#     """
-#     return sum(data) if data else 0
-
-# def manual_min(data):
-#     """
-#     Trouver la valeur minimale dans les données manuellement.
-
-#     Paramètres :
-#     data (list) : Liste des nombres.
-
-#     Retourne :
-#     float : Valeur minimale dans la liste.
-#     """
-#     return min(data) if data else 0
-
-# def manual_max(data):
-#     """
-#     Trouver la valeur maximale dans les données manuellement.
-
-#     Paramètres :
-#     data (list) : Liste des nombres.
-
-#     Retourne :
-#     float : Valeur maximale dans la liste.
-#     """
-#     return max(data) if data else 0
-
-# def calculate_bins(data, n_bins=10):
-#     """
-#     Calculer les bins de l'histogramme manuellement.
-
-#     Paramètres :
-#     data (list) : Liste des nombres.
-#     n_bins (int) : Nombre de bins à calculer.
-
-#     Retourne :
-#     list : Liste des bordures des bins.
-#     """
-#     min_val = manual_min(data)
-#     max_val = manual_max(data)
-#     bin_width = (max_val - min_val) / n_bins if min_val != max_val else 1
-#     return [min_val + i * bin_width for i in range(n_bins + 1)]
-
-# def assign_data_to_bins(data, bins):
-#     """
-#     Assigner les points de données aux bins pour l'histogramme.
-
-#     Paramètres :
-#     data (list) : Liste des nombres.
-#     bins (list) : Liste des bordures des bins.
-
-#     Retourne :
-#     list : Liste des comptes de données dans chaque bin.
-#     """
-#     bin_counts = [0] * (len(bins) - 1)
-#     for value in data:
-#         for i, bin_edge in enumerate(bins):
-#             if i > 0 and value <= bin_edge:
-#                 bin_counts[i - 1] += 1
-#                 break
-#     return bin_counts
-
-def plot_manual_histogram(house_data, course, bins, house_colors):
+def plot_manual_histogram(house_data: Dict[str, List[float]], course: str, bins: List[float], house_colors: Dict[str, str]) -> None:
     """
     Tracer l'histogramme des scores du cours pour chaque maison de Poudlard.
 
@@ -125,14 +55,11 @@ def plot_manual_histogram(house_data, course, bins, house_colors):
     plt.grid(True)
     plt.show()
 
-def main():
-    # Charger le fichier de données
+def main() -> None:
     df = load_data("data/dataset_train.csv")
     
-    # Liste des cours à analyser
     courses = ['Arithmancy', 'Astronomy', 'Herbology', 'Defense Against the Dark Arts', 'Divination', 'Muggle Studies', 'Ancient Runes', 'History of Magic', 'Transfiguration', 'Potions', 'Care of Magical Creatures', 'Charms', 'Flying']
     
-    # Dictionnaire des couleurs pour chaque maison
     house_colors = {
         'Gryffindor': 'red',
         'Slytherin': 'green',
@@ -140,7 +67,6 @@ def main():
         'Hufflepuff': 'yellow'
     }
 
-    # Analyser et tracer les histogrammes pour chaque cours
     for course in courses:
         house_data = get_house_data(df, course)
         if any(house_data.values()):

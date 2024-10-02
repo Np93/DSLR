@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 import matplotlib.pyplot as plt
-import dslr.scripts.pair_plot  # Remplace par le chemin de ton fichier Python
+import dslr.scripts.pair_plot
 
 def test_pair_plot_matrix(mocker):
     mock_show = mocker.patch('matplotlib.pyplot.show')

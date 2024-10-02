@@ -1,4 +1,6 @@
-def manual_count(data):
+from typing import List
+
+def manual_count(data: list[float]) -> int:
     """
     Compte le nombre d'éléments dans une liste.
 
@@ -13,7 +15,7 @@ def manual_count(data):
         count += 1
     return count
 
-def manual_sum(data):
+def manual_sum(data: List[float]) -> float:
     """
     Calcule la somme des éléments dans une liste.
 
@@ -28,7 +30,7 @@ def manual_sum(data):
         total += num
     return total
 
-def manual_mean(data):
+def manual_mean(data: list[float]) -> float:
     """
     Calcule la moyenne des éléments dans une liste.
 
@@ -42,7 +44,7 @@ def manual_mean(data):
     count = manual_count(data)
     return total / count if count != 0 else 0
 
-def manual_std(data, mean):
+def manual_std(data: list[float], mean: float) -> float:
     """
     Calcule l'écart type des éléments dans une liste.
 
@@ -59,7 +61,7 @@ def manual_std(data, mean):
         variance += (x - mean) ** 2
     return (variance / (n - 1)) ** 0.5 if n > 1 else 0
 
-def manual_min(data):
+def manual_min(data: list[float]) -> float:
     """
     Trouve le minimum des éléments dans une liste.
 
@@ -77,7 +79,7 @@ def manual_min(data):
             minimum = num
     return minimum
 
-def manual_max(data):
+def manual_max(data: list[float]) -> float:
     """
     Trouve le maximum des éléments dans une liste.
 
@@ -95,7 +97,7 @@ def manual_max(data):
             maximum = num
     return maximum
 
-def manual_quantile(data, quantile):
+def manual_quantile(data: list[float], quantile: float) -> float:
     """
     Calcule le quantile spécifié des éléments dans une liste.
 
@@ -112,7 +114,7 @@ def manual_quantile(data, quantile):
     index = int(len(sorted_data) * quantile)
     return sorted_data[index]
 
-def calculate_bins(data, n_bins=10):
+def calculate_bins(data: List[float], n_bins: int = 10) -> List[float]:
     """
     Calculer les bins de l'histogramme manuellement.
 
@@ -128,7 +130,7 @@ def calculate_bins(data, n_bins=10):
     bin_width = (max_val - min_val) / n_bins if min_val != max_val else 1
     return [min_val + i * bin_width for i in range(n_bins + 1)]
 
-def assign_data_to_bins(data, bins):
+def assign_data_to_bins(data: List[float], bins: List[float]) -> List[int]:
     """
     Assigner les points de données aux bins pour l'histogramme.
 
