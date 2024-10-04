@@ -44,7 +44,7 @@ def plot_manual_histogram(house_data: Dict[str, List[float]], course: str, bins:
     Retourne :
     None
     """
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(10, 6), num=f"histogram for {course}")
     for house, scores in house_data.items():
         bin_counts = assign_data_to_bins(scores, bins)
         plt.bar([(bins[i] + bins[i + 1]) / 2 for i in range(len(bins) - 1)], bin_counts, width=(bins[1] - bins[0]) * 0.8, alpha=0.5, label=f'{house} ({len(scores)} scores)', color=house_colors.get(house, 'gray'))
