@@ -1,3 +1,4 @@
+import pandas as pd
 from typing import List
 
 def manual_count(data: list[float]) -> int:
@@ -148,3 +149,15 @@ def assign_data_to_bins(data: List[float], bins: List[float]) -> List[int]:
                 bin_counts[i - 1] += 1
                 break
     return bin_counts
+
+def load_data(filepath) -> pd.DataFrame:
+	"""
+	Charger les données à partir d'un fichier CSV.
+
+	Paramètres :
+	filepath (str) : Chemin vers le fichier CSV.
+
+	Retourne :
+	DataFrame : Données chargées sous forme de DataFrame Pandas.
+	"""
+	return pd.read_csv(filepath)
