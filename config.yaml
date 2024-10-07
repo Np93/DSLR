@@ -1,0 +1,5 @@
+eta: 0.01
+n_iter: 10000
+lambda_: 0.01
+gradient_type: "batch"  # Choix : "batch", "sgd", "mini-batch"
+batch_size: 32  # Taille des mini-batchs pour mini-batch GD
