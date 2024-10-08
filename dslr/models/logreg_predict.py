@@ -43,7 +43,6 @@ class LogisticRegressionOVR_predict:
         hp_features = hptest.iloc[:, 6:].select_dtypes(include=[np.number])
         # Remplir les valeurs manquantes avec la méthode forward fill
         hp_features = hp_features.ffill()
-        # hp_features = hp_features.fillna(method='ffill')
         # Standardiser les caractéristiques
         hp_features = self._scaling(hp_features)
         return hp_features
