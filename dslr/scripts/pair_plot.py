@@ -30,9 +30,9 @@ def plot_pair_matrix(dataset: pd.DataFrame, target_label: str , label_fontsize: 
 
 	Paramètres :
 	pd.DataFrame: dataset contenant les données à tracer.
-	str: target_label : Le nom de la colonne target (Hogwart house)
-	int: label_fontsize,la taille des caractères des labels
-	int: title_fontsize,la taille des caractères des titres
+	str: target_label : Le nom de la colonne target (Hogwart house).
+	int: label_fontsize,la taille des caractères des labels.
+	int: title_fontsize,la taille des caractères des titres.
 
 	Retourne :
 	None
