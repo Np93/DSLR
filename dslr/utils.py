@@ -155,9 +155,9 @@ def load_data(filepath) -> pd.DataFrame:
 	Charger les données à partir d'un fichier CSV.
 
 	Paramètres :
-	filepath (str) : Chemin vers le fichier CSV.
+	str: filepath, le hemin vers le fichier CSV.
 
 	Retourne :
-	DataFrame : Données chargées sous forme de DataFrame Pandas.
+	pd.DataFrame: DataFrame, les données chargées sous forme de DataFrame Pandas.
 	"""
 	return pd.read_csv(filepath)
