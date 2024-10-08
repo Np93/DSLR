@@ -3,16 +3,18 @@ import matplotlib.pyplot as plt
 import sys
 from dslr.utils import load_data
 
-def preprocess_data(dataset) -> pd.DataFrame:
+def preprocess_data(dataset: pd.DataFrame) -> pd.DataFrame:
 	"""
-	Prétraiter les données en supprimant les colonnes non numériques et en gérant les valeurs manquantes.
+	Filtrer les données du fichier (dataset) en supprimant les colonnes non numériques et en gérant les valeurs manquantes, 
+	en vue de la régression logistique.
 
 	Paramètres :
-	dataset (DataFrame) : DataFrame contenant les données à prétraiter.
+	pd.DataFrame: dataset contenant les données à prétraiter.
 
 	Retourne :
-	DataFrame : DataFrame prétraitée avec uniquement les colonnes numériques et sans valeurs manquantes ET les noms de house.
+	DataFrame : combine_data filtrée avec en plus les noms de maison.
 	"""
+	
 	numeric_dataset = dataset.select_dtypes(include=[float, int])
 	numeric_dataset = numeric_dataset.iloc[:, 1:]
 	categorical_column = dataset['Hogwarts House']
@@ -21,15 +23,16 @@ def preprocess_data(dataset) -> pd.DataFrame:
 	combined_data.dropna(inplace=True)
 	return combined_data
 
-def plot_pair_matrix(dataset, hue_column , label_fontsize=10, title_fontsize=12) -> None:
+def plot_pair_matrix(dataset: pd.DataFrame, target_label: str , label_fontsize: int = 10, title_fontsize: int = 12) -> None:
 	"""
-	Tracer une matrice de graphiques de dispersion pour chaque paire de colonnes numériques, et en diagonal les histogrammes.
+	Tracer une matrice de graphiques de dispersion pour chaque paire de colonnes numériques, et en diagonal les histogrammes,
+	le tout en fonction des maisons.
 
 	Paramètres :
-	dataset (DataFrame) : DataFrame contenant les données à tracer.
-	hue_column : La colonne target (Hogwart house)
-	label_fontsize : la taille des caractères des labels
-	title_fontsize : la taille des caractères des titres
+	pd.DataFrame: dataset contenant les données à tracer.
+	str: target_label : Le nom de la colonne target (Hogwart house)
+	int: label_fontsize,la taille des caractères des labels
+	int: title_fontsize,la taille des caractères des titres
 
 	Retourne :
 	None
@@ -42,17 +45,17 @@ def plot_pair_matrix(dataset, hue_column , label_fontsize=10, title_fontsize=12)
 	}
 	numeric_columns = dataset.select_dtypes(include=[float, int]).columns
 	num_columns = len(numeric_columns)
-	fig, axs = plt.subplots(num_columns,num_columns, figsize=(12,12), num="Pair Plot feature1 vs feature2")
+	fig, axs = plt.subplots(num_columns,num_columns, figsize=(12, 12), num="Pair Plot feature1 vs feature2")
 
 	for i, feature1 in enumerate(numeric_columns):
 		for j, feature2 in enumerate(numeric_columns):
 			if i == j:
-				for house in dataset[hue_column].unique():
-					subset = dataset[dataset[hue_column] == house]
-					axs[i,j].hist(subset[feature1], bins=50, label=house, color=house_colors[house], alpha=0.7)
+				for house in dataset[target_label].unique():
+					subset = dataset[dataset[target_label] == house]
+					axs[i,j].hist(subset[feature1], bins = 50, label=house, color=house_colors[house], alpha=0.7)
 			else:
-				for house in dataset[hue_column].unique():
-					subset = dataset[dataset[hue_column] == house]
+				for house in dataset[target_label].unique():
+					subset = dataset[dataset[target_label] == house]
 					axs[i,j].scatter(subset[feature1], subset[feature2], label=house, color=house_colors[house], alpha=0.3)
 			axs[i, j].set_xticks([])
 			axs[i, j].set_yticks([])
@@ -66,7 +69,7 @@ def plot_pair_matrix(dataset, hue_column , label_fontsize=10, title_fontsize=12)
 		axs[0, i].set_title(title, fontsize=title_fontsize)
 
 	handles, labels = axs[0, 1].get_legend_handles_labels()
-	fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1, 1), title=hue_column, fontsize=label_fontsize)
+	fig.legend(handles, labels, loc='upper right', bbox_to_anchor=(1, 1), title=target_label, fontsize=label_fontsize)
 	plt.subplots_adjust(left=0.1, right=0.9, top=0.9)
 	plt.show()
 
