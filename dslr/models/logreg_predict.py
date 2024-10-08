@@ -42,7 +42,8 @@ class LogisticRegressionOVR_predict:
         # Sélectionner uniquement les colonnes numériques à partir de la 6ème colonne
         hp_features = hptest.iloc[:, 6:].select_dtypes(include=[np.number])
         # Remplir les valeurs manquantes avec la méthode forward fill
-        hp_features = hp_features.fillna(method='ffill')
+        hp_features = hp_features.ffill()
+        # hp_features = hp_features.fillna(method='ffill')
         # Standardiser les caractéristiques
         hp_features = self._scaling(hp_features)
         return hp_features
