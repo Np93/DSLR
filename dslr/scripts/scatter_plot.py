@@ -189,7 +189,7 @@ def get_max_correlation(correlations_matrix: pd.DataFrame) -> float:
 	correlation_coefficient_max = correlation_matrix_filtered.max()
 	return correlation_coefficient_max
 
-def main():
+def main() -> None:
 	dataset = load_data("data/dataset_train.csv")
 	numeric_columns = numeric_features(dataset)
 	cleaned_data = preprocess_data(dataset)
