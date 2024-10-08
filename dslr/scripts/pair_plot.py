@@ -12,7 +12,7 @@ def preprocess_data(dataset: pd.DataFrame) -> pd.DataFrame:
 	pd.DataFrame: dataset contenant les données à prétraiter.
 
 	Retourne :
-	DataFrame : combine_data filtrée avec en plus les noms de maison.
+	pd.DataFrame: l'ensemble des données filtrées avec en plus les noms de maison.
 	"""
 	
 	numeric_dataset = dataset.select_dtypes(include=[float, int])
