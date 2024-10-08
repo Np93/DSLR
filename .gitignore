@@ -30,7 +30,6 @@
 *.exe
 *.out
 *.app
-.env
 
 # other
 *.swp
@@ -45,9 +44,6 @@ gmon.out
 compile_commands.json
 .cache
 build
-*test.csv
-*train.csv
-*valid.csv
 
 # Node artifact files
 node_modules/
@@ -95,7 +91,7 @@ Thumbs.db
 *.wmv
 
 #jupyter
-# *.ipynb
+ *.ipynb
 
 *.pt
 
@@ -114,10 +110,12 @@ coverage*.xml
 **/__pycache__/
 /Options/
 
+houses.csv
+trained_weights.json
+
 # tmp folders
 vol_tmp/*
 local_disk/*
 tmp/
 backtest_data/
-file_upload_in_azure/
 **/*inmemory_cache_mock.yaml

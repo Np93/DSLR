@@ -14,7 +14,7 @@ def evaluate_predictions(predictions_path, true_data_path):
     
     # Calculer la précision
     accuracy = accuracy_score(merged_df['Hogwarts House_true'], merged_df['Hogwarts House_pred'])
-    print(f"Accuracy: {accuracy:.0%}")
+    print(f"Accuracy: {accuracy:.2%}")
 
 if __name__ == "__main__":
     evaluate_predictions('houses.csv', 'data/dataset_train.csv')

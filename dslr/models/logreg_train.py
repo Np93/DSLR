@@ -6,6 +6,7 @@ import json
 import yaml
 from typing import List, Tuple, Dict
 from sklearn.preprocessing import LabelEncoder
+import math
 
 # Fonction pour charger la configuration YAML
 def load_config(config_path: str) -> Dict:
@@ -26,6 +27,21 @@ def manual_median(data: List[float]) -> float:
         median = sorted_data[n//2]
     return median
 
+# Calcul de la moyenne manuelle
+def manual_mean(data: List[float]) -> float:
+    return sum(data) / len(data) if len(data) > 0 else 0
+
+# Calcul de l'écart-type manuel
+def manual_std(data: List[float], mean: float) -> float:
+    variance = sum((x - mean) ** 2 for x in data) / len(data) if len(data) > 0 else 0
+    return math.sqrt(variance)
+
+# Standardiser une colonne manuellement
+def standardize_column(data: List[float], mean: float, std: float) -> List[float]:
+    if std == 0:  # Si l'écart-type est 0, on ne change pas les valeurs
+        return data
+    return [(x - mean) / std for x in data]
+
 class LogisticRegressionOVR_train:
     def __init__(self, config: Dict) -> None:
         """
@@ -43,9 +59,22 @@ class LogisticRegressionOVR_train:
 
     def preprocess_data(self, filepath: str) -> Tuple[np.ndarray, np.ndarray, List[str]]:
         data = pd.read_csv(filepath)
-        X = data.iloc[:, 5:].select_dtypes(include=[np.number]).apply(lambda col: col.fillna(manual_median(col.dropna())))
+        # Remplacer les valeurs manquantes par la médiane manuelle
+        X = data.iloc[:, 5:].select_dtypes(include=[np.number]).apply(
+            lambda col: col.fillna(manual_median(col.dropna()))
+        )
         y = self.label_encoder.fit_transform(data['Hogwarts House'])
+        # Standardiser manuellement chaque colonne
+        for col in X.columns:
+            column_data = X[col].tolist()  # Convertir en liste
+            mean = manual_mean(column_data)  # Calculer la moyenne
+            std = manual_std(column_data, mean)  # Calculer l'écart-type
+            X[col] = standardize_column(column_data, mean, std)  # Standardiser
         return X.values, y, list(self.label_encoder.classes_)
+        # data = pd.read_csv(filepath)
+        # X = data.iloc[:, 5:].select_dtypes(include=[np.number]).apply(lambda col: col.fillna(manual_median(col.dropna())))
+        # y = self.label_encoder.fit_transform(data['Hogwarts House'])
+        # return X.values, y, list(self.label_encoder.classes_)
 
     @staticmethod
     def sigmoid(z: np.ndarray) -> np.ndarray:
