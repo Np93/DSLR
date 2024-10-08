@@ -73,7 +73,7 @@ def plot_pair_matrix(dataset: pd.DataFrame, target_label: str , label_fontsize: 
 	plt.subplots_adjust(left=0.1, right=0.9, top=0.9)
 	plt.show()
 
-def main():
+def main() -> None:
 	df = load_data("data/dataset_train.csv")
 	cleaned_data = preprocess_data(df)
 	if not cleaned_data.empty:
