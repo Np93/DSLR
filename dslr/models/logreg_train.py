@@ -90,6 +90,7 @@ class LogisticRegressionOVR_train:
         return cost, gradient
 
     def train_batch_gradient_descent(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        X = np.insert(X, 0, 1, axis=1)
         weights = np.random.rand(X.shape[1]) * 0.01
         for _ in range(self.n_iter):
             cost, gradient = self.compute_cost(X, y, weights)
@@ -99,6 +100,7 @@ class LogisticRegressionOVR_train:
         return weights
 
     def train_stochastic_gradient_descent(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        X = np.insert(X, 0, 1, axis=1)
         weights = np.random.rand(X.shape[1]) * 0.01
         m = len(y)
         for _ in range(self.n_iter):
@@ -112,6 +114,7 @@ class LogisticRegressionOVR_train:
         return weights
 
     def train_mini_batch_gradient_descent(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        X = np.insert(X, 0, 1, axis=1)
         weights = np.random.rand(X.shape[1]) * 0.01
         m = len(y)
         for _ in range(self.n_iter):

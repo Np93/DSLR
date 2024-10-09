@@ -17,4 +17,4 @@ def evaluate_predictions(predictions_path, true_data_path):
     print(f"Accuracy: {accuracy:.2%}")
 
 if __name__ == "__main__":
-    evaluate_predictions('houses.csv', 'data/dataset_train.csv')
+    evaluate_predictions('houses.csv', 'data/test_data.csv')

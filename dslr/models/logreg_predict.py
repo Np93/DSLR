@@ -40,7 +40,7 @@ class LogisticRegressionOVR_predict:
         numpy.ndarray : Les caractéristiques traitées.
         """
         # Sélectionner uniquement les colonnes numériques à partir de la 6ème colonne
-        hp_features = hptest.iloc[:, 6:].select_dtypes(include=[np.number])
+        hp_features = hptest.iloc[:, 5:].select_dtypes(include=[np.number])
         # Remplir les valeurs manquantes avec la méthode forward fill
         hp_features = hp_features.ffill()
         # Standardiser les caractéristiques

@@ -49,8 +49,8 @@ def test_accuracy(predict):
     true_df = pd.read_csv('data/test_data.csv')
     merged_df = pd.merge(true_df, pred_df, on="Index", suffixes=('_true', '_pred'))
     accuracy = accuracy_score(merged_df['Hogwarts House_true'], merged_df['Hogwarts House_pred'])
-    if accuracy < 0.99:
+    if accuracy < 1.0:
         correct_predictions = (merged_df['Hogwarts House_true'] == merged_df['Hogwarts House_pred']).sum()
         total = len(merged_df)
         print(f"Nombre de prédictions correctes : {correct_predictions} sur {total}")
-    assert accuracy >= 0.99, f"La précision est de {accuracy:.2%}. Elle est inférieure à 99%."
+    assert accuracy >= 1.0, f"La précision est de {accuracy:.2%}. Elle est inférieure à 99%."
