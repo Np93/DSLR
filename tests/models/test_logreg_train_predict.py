@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from sklearn.metrics import accuracy_score
 import json
+from typing import List, Dict
 from dslr.models.logreg_train import LogisticRegressionOVR_train, load_config
 from dslr.models.logreg_predict import LogisticRegressionOVR_predict
 
@@ -44,13 +45,43 @@ def predict(train_model):
     houses = pd.DataFrame({'Index': range(len(predicts)), 'Hogwarts House': predicts})
     houses.to_csv('houses.csv', index=False)
 
+def analyze_weights(weights_dict: Dict[str, List[float]], feature_names: List[str]) -> None:
+    for class_label, weights in weights_dict.items():
+        print(f"\nHouse '\033[38;5;214m{class_label}\033[0m' :")
+        # weights_with_features = list(zip(feature_names, weights))
+        weights_with_features = list(zip(feature_names, weights[1:]))
+        weights_with_features_sorted = sorted(weights_with_features, key=lambda x: abs(x[1]), reverse=True)
+        print("Caractéristiques les plus influentes (en termes de poids) :")
+        for feature, weight in weights_with_features_sorted[:5]:
+            # print(f"{feature}: {weight:.4f}")
+            print(f"{feature}: \033[32m{weight:.4f}\033[0m")
+        print("\nCaractéristiques les moins influentes (poids proches de 0) :")
+        for feature, weight in weights_with_features_sorted[-5:]:
+            # print(f"{feature}: {weight:.4f}")
+            print(f"{feature}: \033[31m{weight:.4f}\033[0m")
+
+def colorize_dataframe(df):
+    colored_df = df.copy()
+    colored_df['Hogwarts House_true'] = df['Hogwarts House_true'].apply(lambda x: f"\033[32m{x}\033[0m")  # Vert
+    colored_df['Hogwarts House_pred'] = df['Hogwarts House_pred'].apply(lambda x: f"\033[31m{x}\033[0m")  # Rouge
+    return colored_df
+
 def test_accuracy(predict):
     pred_df = pd.read_csv('houses.csv')
     true_df = pd.read_csv('data/test_data.csv')
     merged_df = pd.merge(true_df, pred_df, on="Index", suffixes=('_true', '_pred'))
     accuracy = accuracy_score(merged_df['Hogwarts House_true'], merged_df['Hogwarts House_pred'])
     if accuracy < 1.0:
+        incorrect_predictions = merged_df[merged_df['Hogwarts House_true'] != merged_df['Hogwarts House_pred']]
         correct_predictions = (merged_df['Hogwarts House_true'] == merged_df['Hogwarts House_pred']).sum()
         total = len(merged_df)
+        incorrect_predictions = incorrect_predictions.sort_values(by='Hogwarts House_true')
+        colored_df = colorize_dataframe(incorrect_predictions)
         print(f"Nombre de prédictions correctes : {correct_predictions} sur {total}")
-    assert accuracy >= 1.0, f"La précision est de {accuracy:.2%}. Elle est inférieure à 99%."
+        print("\nErreurs de prédictions :")
+        print(colored_df[['Index', 'Hogwarts House_true', 'Hogwarts House_pred']])
+    with open('trained_weights.json', 'r') as f:
+        weights_dict = json.load(f)
+    feature_names = pd.read_csv('data/train_data.csv').columns[6:]  # À partir de la 6ème
+    analyze_weights(weights_dict, feature_names)
+    assert accuracy >= 1.0, f"La précision est de {accuracy:.2%}. Elle est inférieure à 100%."
