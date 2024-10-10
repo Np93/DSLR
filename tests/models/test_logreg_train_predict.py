@@ -79,7 +79,7 @@ def test_accuracy(predict):
         colored_df = colorize_dataframe(incorrect_predictions)
         print(f"Nombre de prédictions correctes : {correct_predictions} sur {total}")
         print("\nErreurs de prédictions :")
-        print(colored_df[['Index', 'Hogwarts House_true', 'Hogwarts House_pred']])
+        print(colored_df[['Index', 'First Name', 'Last Name', 'Hogwarts House_true', 'Hogwarts House_pred']])
     with open('trained_weights.json', 'r') as f:
         weights_dict = json.load(f)
     feature_names = pd.read_csv('data/train_data.csv').columns[6:]  # À partir de la 6ème
