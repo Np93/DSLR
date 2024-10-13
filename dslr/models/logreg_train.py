@@ -8,16 +8,13 @@ from typing import List, Tuple, Dict
 from sklearn.preprocessing import LabelEncoder
 import math
 
-# Fonction pour charger la configuration YAML
 def load_config(config_path: str) -> Dict:
     with open(config_path, 'r') as file:
         return yaml.safe_load(file)
 
-# Fonction pour obtenir le chemin vers la racine du projet
 def get_project_root() -> str:
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 
-# Calcul de la médiane manuelle
 def manual_median(data: List[float]) -> float:
     sorted_data = sorted(data)
     n = len(sorted_data)
@@ -27,16 +24,13 @@ def manual_median(data: List[float]) -> float:
         median = sorted_data[n//2]
     return median
 
-# Calcul de la moyenne manuelle
 def manual_mean(data: List[float]) -> float:
     return sum(data) / len(data) if len(data) > 0 else 0
 
-# Calcul de l'écart-type manuel
 def manual_std(data: List[float], mean: float) -> float:
     variance = sum((x - mean) ** 2 for x in data) / len(data) if len(data) > 0 else 0
     return math.sqrt(variance)
 
-# Standardiser une colonne manuellement
 def standardize_column(data: List[float], mean: float, std: float) -> List[float]:
     if std == 0:  # Si l'écart-type est 0, on ne change pas les valeurs
         return data
@@ -55,26 +49,24 @@ class LogisticRegressionOVR_train:
         self.lambda_ = config['lambda_']
         self.gradient_type = config['gradient_type']
         self.batch_size = config.get('batch_size', 32)  # Taille par défaut pour mini-batch GD
+        self.early_stopping = config.get('early_stopping', False)
+        self.patience = config.get('patience', 10)
+        self.tolerance = config.get('tolerance', 1e-4)
         self.label_encoder = LabelEncoder()
 
     def preprocess_data(self, filepath: str) -> Tuple[np.ndarray, np.ndarray, List[str]]:
         data = pd.read_csv(filepath)
-        # Remplacer les valeurs manquantes par la médiane manuelle
         X = data.iloc[:, 5:].select_dtypes(include=[np.number]).apply(
             lambda col: col.fillna(manual_median(col.dropna()))
         )
         y = self.label_encoder.fit_transform(data['Hogwarts House'])
         # Standardiser manuellement chaque colonne
         for col in X.columns:
-            column_data = X[col].tolist()  # Convertir en liste
-            mean = manual_mean(column_data)  # Calculer la moyenne
-            std = manual_std(column_data, mean)  # Calculer l'écart-type
-            X[col] = standardize_column(column_data, mean, std)  # Standardiser
+            column_data = X[col].tolist()
+            mean = manual_mean(column_data)
+            std = manual_std(column_data, mean)
+            X[col] = standardize_column(column_data, mean, std)
         return X.values, y, list(self.label_encoder.classes_)
-        # data = pd.read_csv(filepath)
-        # X = data.iloc[:, 5:].select_dtypes(include=[np.number]).apply(lambda col: col.fillna(manual_median(col.dropna())))
-        # y = self.label_encoder.fit_transform(data['Hogwarts House'])
-        # return X.values, y, list(self.label_encoder.classes_)
 
     @staticmethod
     def sigmoid(z: np.ndarray) -> np.ndarray:
@@ -89,27 +81,53 @@ class LogisticRegressionOVR_train:
         gradient = np.dot(X.T, h - y) / m + (self.lambda_ / m) * weights
         return cost, gradient
 
+    def early_stopping_check(self, cost_history: List[float], patience: int, tolerance: float) -> bool:
+        """
+        Vérifier si Early Stopping doit être activé.
+        Si le coût n'a pas diminué de manière significative pendant 'patience' itérations, arrêter l'entraînement.
+        """
+        if len(cost_history) > patience:
+            recent_costs = cost_history[-patience:]
+            tolerance = float(tolerance)
+            if np.abs(recent_costs[-1] - recent_costs[0]) < tolerance:
+                return True
+        return False
+
     def train_batch_gradient_descent(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         X = np.insert(X, 0, 1, axis=1)
         weights = np.random.rand(X.shape[1]) * 0.01
+        cost_history = []
+        # initial_cost, _ = self.compute_cost(X, y, weights)
+        # print(f"Initial cost (premier coût) : {initial_cost}")
         for _ in range(self.n_iter):
             cost, gradient = self.compute_cost(X, y, weights)
             weights -= self.eta * gradient
+            cost_history.append(cost)
             if np.isnan(cost):
                 break
+            if self.early_stopping and self.early_stopping_check(cost_history, self.patience, self.tolerance):
+                print(f"Early stopping activated at iteration {i}")
+                break
+        # final_cost = cost_history[-1]
+        # print(f"Final cost (dernier coût) : {final_cost}")
         return weights
 
     def train_stochastic_gradient_descent(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         X = np.insert(X, 0, 1, axis=1)
         weights = np.random.rand(X.shape[1]) * 0.01
         m = len(y)
+        cost_history = []
         for _ in range(self.n_iter):
             for i in range(m):
                 xi = X[i:i+1]  # Un seul exemple de données
                 yi = y[i:i+1]
                 cost, gradient = self.compute_cost(xi, yi, weights)
                 weights -= self.eta * gradient
+                cost_history.append(cost)
                 if np.isnan(cost):
+                    break
+                if self.early_stopping and self.early_stopping_check(cost_history, self.patience, self.tolerance):
+                    print(f"Early stopping activated at iteration {i}")
                     break
         return weights
 
@@ -117,6 +135,7 @@ class LogisticRegressionOVR_train:
         X = np.insert(X, 0, 1, axis=1)
         weights = np.random.rand(X.shape[1]) * 0.01
         m = len(y)
+        cost_history = []
         for _ in range(self.n_iter):
             indices = np.random.permutation(m)
             X_shuffled = X[indices]
@@ -126,7 +145,11 @@ class LogisticRegressionOVR_train:
                 y_batch = y_shuffled[i:i+self.batch_size]
                 cost, gradient = self.compute_cost(X_batch, y_batch, weights)
                 weights -= self.eta * gradient
+                cost_history.append(cost)
                 if np.isnan(cost):
+                    break
+                if self.early_stopping and self.early_stopping_check(cost_history, self.patience, self.tolerance):
+                    print(f"Early stopping activated at iteration {i}")
                     break
         return weights
 
@@ -168,153 +191,3 @@ if __name__ == "__main__":
             json.dump(weights, f, indent=4)
         
         print("Weights saved in 'trained_weights.json'.")
-
-
-
-
-# import numpy as np
-# import pandas as pd
-# import sys
-# import json
-# from typing import List, Tuple, Dict
-# from sklearn.preprocessing import StandardScaler, LabelEncoder
-
-# def manual_median(data: List[float]) -> float:
-#     """
-#     Calculer la médiane manuellement.
-
-#     Paramètres :
-#     data (list) : Liste des valeurs.
-
-#     Retourne :
-#     float : La médiane des valeurs.
-#     """
-#     sorted_data = sorted(data)  # Trier les données
-#     n = len(sorted_data)
-#     if n % 2 == 0:
-#         # Si le nombre de valeurs est pair, la médiane est la moyenne des deux valeurs centrales
-#         median1 = sorted_data[n//2]
-#         median2 = sorted_data[n//2 - 1]
-#         median = (median1 + median2) / 2
-#     else:
-#         # Si le nombre de valeurs est impair, la médiane est la valeur centrale
-#         median = sorted_data[n//2]
-#     return median
-
-# class LogisticRegressionOVR_train:
-#     def __init__(self, eta: float = 5e-5, n_iter: int = 10000, lambda_: float = 0.01) -> None:
-#         """
-#         Initialiser le modèle de régression logistique one-vs-all.
-
-#         Paramètres :
-#         eta (float) : Taux d'apprentissage.
-#         n_iter (int) : Nombre d'itérations.
-#         lambda_ (float) : Paramètre de régularisation L2.
-#         """
-#         self.eta = eta
-#         self.n_iter = n_iter
-#         self.lambda_ = lambda_
-#         self.label_encoder = LabelEncoder()
-
-#     def preprocess_data(self, filepath: str) -> Tuple[np.ndarray, np.ndarray, List[str]]:
-#         """
-#         Prétraiter les données en chargeant le fichier CSV et en traitant les caractéristiques numériques.
-
-#         Paramètres :
-#         filepath (str) : Chemin vers le fichier CSV contenant les données.
-
-#         Retourne :
-#         tuple : Un tuple contenant les caractéristiques (X), les étiquettes (y) et les classes.
-#         """
-#         data = pd.read_csv(filepath)  # Charger les données à partir du fichier CSV
-#         # Sélectionner les colonnes numériques à partir de la 6ème colonne et remplacer les valeurs manquantes par la médiane manuelle
-#         X = data.iloc[:, 5:].select_dtypes(include=[np.number]).apply(lambda col: col.fillna(manual_median(col.dropna())))
-#         y = self.label_encoder.fit_transform(data['Hogwarts House'])  # Encoder les étiquettes des classes
-#         return X.values, y, self.label_encoder.classes_
-
-#     def sigmoid(self, z: np.ndarray) -> np.ndarray:
-#         """
-#         Calculer la fonction sigmoïde.
-
-#         Paramètres :
-#         z (numpy.ndarray) : Valeurs d'entrée pour la fonction sigmoïde.
-
-#         Retourne :
-#         numpy.ndarray : Valeurs après application de la fonction sigmoïde.
-#         """
-#         return 1 / (1 + np.exp(-z))
-
-#     def compute_cost(self, X: np.ndarray, y: np.ndarray, weights: np.ndarray) -> Tuple[float, np.ndarray]:
-#         """
-#         Calculer le coût et le gradient pour la régression logistique.
-
-#         Paramètres :
-#         X (numpy.ndarray) : Caractéristiques des données.
-#         y (numpy.ndarray) : Étiquettes des données.
-#         weights (numpy.ndarray) : Poids du modèle.
-
-#         Retourne :
-#         tuple : Un tuple contenant le coût et le gradient.
-#         """
-#         m = len(y)
-#         h = self.sigmoid(np.dot(X, weights))  # Prédictions de l'hypothèse
-#         epsilon = 1e-5
-#         # Calcul du coût avec une petite valeur epsilon pour éviter log(0)
-#         cost = -np.mean(y * np.log(h + epsilon) + (1 - y) * np.log(1 - h + epsilon))
-#         cost += self.lambda_ / (2 * m) * np.sum(weights**2)  # Terme de régularisation L2
-#         gradient = np.dot(X.T, h - y) / m + (self.lambda_ / m) * weights  # Gradient avec régularisation L2
-#         return cost, gradient
-
-#     def train_logistic_regression(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-#         """
-#         Entraîner le modèle de régression logistique en utilisant la descente de gradient.
-
-#         Paramètres :
-#         X (numpy.ndarray) : Caractéristiques des données.
-#         y (numpy.ndarray) : Étiquettes des données.
-
-#         Retourne :
-#         numpy.ndarray : Poids appris pour le modèle.
-#         """
-#         weights = np.random.rand(X.shape[1]) * 0.01  # Initialiser les poids aléatoirement
-#         for i in range(self.n_iter):
-#             cost, gradient = self.compute_cost(X, y, weights)  # Calculer le coût et le gradient
-#             weights -= self.eta * gradient  # Mettre à jour les poids
-#             # if i % 1000 == 0:
-#             #     print(f"Iteration {i}: Cost = {cost}")  # Afficher le coût toutes les 1000 itérations
-#             if np.isnan(cost):
-#                 print("NaN detected in cost\nBreaking due to NaN in cost at iteration", i)
-#                 break
-#         return weights
-
-#     def fit(self, filepath: str) -> Dict[str, List[float]]:
-#         """
-#         Entraîner le modèle pour chaque classe en utilisant l'approche one-vs-all.
-
-#         Paramètres :
-#         filepath (str) : Chemin vers le fichier CSV contenant les données d'entraînement.
-
-#         Retourne :
-#         dict : Dictionnaire contenant les poids pour chaque classe.
-#         """
-#         X, y, class_labels = self.preprocess_data(filepath)  # Prétraiter les données
-#         weights_dict = {}
-#         for i, cls_label in enumerate(class_labels):
-#             # print(f"Training for class {cls_label}")
-#             y_binary = (y == i).astype(int)  # Créer des étiquettes binaires pour la classe actuelle
-#             weights = self.train_logistic_regression(X, y_binary)  # Entraîner le modèle pour cette classe
-#             weights_dict[cls_label] = weights.tolist()  # Sauvegarder les poids pour cette classe
-#         return weights_dict
-
-# if __name__ == "__main__":
-#     # Vérifier si le chemin vers le fichier de données est fourni en argument
-#     if len(sys.argv) < 2:
-#         print("Usage: python logreg_train.py <path_to_data>")
-#     else:
-#         # Initialiser et entraîner le modèle
-#         model = LogisticRegressionOVR_train()
-#         weights = model.fit(sys.argv[1])
-#         # Sauvegarder les poids appris dans un fichier JSON
-#         with open('trained_weights.json', 'w') as f:
-#             json.dump(weights, f, indent=4)
-#         print("Weights saved in 'trained_weights.json'.")

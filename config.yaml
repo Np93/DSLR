@@ -1,5 +1,8 @@
 eta: 0.01
 n_iter: 1000
 lambda_: 0.01
-gradient_type: "batch"  # Choix : "batch", "sgd", "mini-batch"
-batch_size: 32  # Taille des mini-batchs pour mini-batch GD
+gradient_type: "batch"  # "batch" ou "sgd", "mini-batch"
+batch_size: 32  # seulement pour mini-batch
+early_stopping: true  # Active Early Stopping
+patience: 10  # Nombre d'itérations sans amélioration avant l'arrêt
+tolerance: 1e-4  # Seuil de tolérance pour l'amélioration du coût
