@@ -1,6 +1,6 @@
 import pandas as pd
 import sys
-from dslr.utils import manual_count, manual_sum, manual_mean, manual_std, manual_min, manual_max, manual_quantile
+from dslr.utils import manual_count, manual_sum, manual_mean, manual_std, manual_min, manual_max, manual_quantile, load_data
 
 def describe_data(data_path: str) -> None:
     """
@@ -12,7 +12,7 @@ def describe_data(data_path: str) -> None:
     Retourne :
     None
     """
-    df = pd.read_csv(data_path)
+    df = load_data(data_path)
 
     if df.isna().all().any():
         print("Error: One or more columns are fully NaN.")
