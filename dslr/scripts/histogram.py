@@ -2,19 +2,7 @@ import pandas as pd
 import sys
 import matplotlib.pyplot as plt
 from typing import List, Dict
-from dslr.utils import manual_min, manual_max, calculate_bins, assign_data_to_bins
-
-def load_data(filepath: str) -> pd.DataFrame:
-    """
-    Charger les données à partir d'un fichier CSV.
-
-    Paramètres :
-    filepath (str) : Chemin vers le fichier CSV.
-
-    Retourne :
-    DataFrame : Données chargées sous forme de DataFrame Pandas.
-    """
-    return pd.read_csv(filepath)
+from dslr.utils import manual_min, manual_max, calculate_bins, assign_data_to_bins, load_data
 
 def get_house_data(df: pd.DataFrame, course: str) -> Dict[str, List[float]]:
     """
@@ -57,9 +45,9 @@ def plot_manual_histogram(house_data: Dict[str, List[float]], course: str, bins:
 
 def main() -> None:
     df = load_data("data/dataset_train.csv")
-    
+
     courses = ['Arithmancy', 'Astronomy', 'Herbology', 'Defense Against the Dark Arts', 'Divination', 'Muggle Studies', 'Ancient Runes', 'History of Magic', 'Transfiguration', 'Potions', 'Care of Magical Creatures', 'Charms', 'Flying']
-    
+
     house_colors = {
         'Gryffindor': 'red',
         'Slytherin': 'green',

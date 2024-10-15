@@ -4,6 +4,7 @@ import json
 import sys
 import os
 from typing import List, Tuple
+
 def is_integer(value):
 	try:
 		int(value)
@@ -19,7 +20,7 @@ def is_float(value):
 		return True
 	except ValueError:
 		return False
-	
+
 class CSV_Checker:
 	def __init__(self, file_path: str, delimiter: str =',', encoding: str ='utf-8') -> None:
 		"""
@@ -65,11 +66,11 @@ class CSV_Checker:
 			else:
 				print(f"CSV file is corrupted, therefore not loaded")
 				sys.exit(1)
-				
+
 		except Exception as e:
 			print("Error loading CSV: {e}")
 			sys.exit(1)
-	
+
 	def check_delimiter_inconsistency(self):
 		"""
 		Compte pour chaque ligne du fichier le nombre de délimiteurs, en corollaire il détecte les lignes vides
@@ -95,7 +96,7 @@ class CSV_Checker:
 						self.delimiter_inconsistency[i+1] = "Number of delimiter not the one expected"
 						delimiter_counts.clear()
 						break
-				
+
 			if self.delimiter_inconsistency:
 				print(f"delimiter inconsistency found !")
 				for line_number, error in self.delimiter_inconsistency.items():
@@ -104,12 +105,12 @@ class CSV_Checker:
 			else:
 				self.expected_num_column = expected_num_delimiter + 1
 				print(f"No delimiter inconsistency detected, {self.expected_num_column} columns")
-			
+
 		except Exception as e:
 			print(f"Error checking for delimiter inconsistencies: {e}")
 			sys.exit(1)
-			
-	
+
+
 	def check_unnamed_variables(self):
 		"""
 		Vérifie que tout les paramètres sont décrits par leurs noms
@@ -124,11 +125,11 @@ class CSV_Checker:
 					self.error_found = True
 				else:
 					print("No empty column headers detected.")
-					
+
 		except Exception as e:
 			print(f"Error while checking column headers: {e}")
 			sys.exit(1)
-	
+
 
 	def filter_cell_nonnumeric(self, column_types: list[set]):
 		"""
@@ -156,15 +157,15 @@ class CSV_Checker:
 						value = data_row[col_index].strip()
 						if not (is_integer(value) or is_float(value)):
 							row_str_list.append(col_index)
-					if row_str_list:        
+					if row_str_list:
 						self.string_in_numeric_dict[i]=row_str_list
-				
+
 			for row_idx, col_list in self.string_in_numeric_dict.items():
 				print(f"Row {row_idx} has strings in numeric columns at positions: {col_list}")
 
 		except Exception as e:
 			print(f"Error checking for delimiter inconsistencies: {e}")
-			sys.exit(1)	
+			sys.exit(1)
 
 	def analyze_data_type(self):
 		"""
@@ -180,7 +181,7 @@ class CSV_Checker:
 			with open(self.file_path, 'r', encoding=self.encoding) as f:
 				header = f.readline().strip().split(self.delimiter)
 				column_types = [set() for _ in range(len(header))]
-			
+
 				exception_value = {'nan', ''}
 
 				for i, line in enumerate(f):
@@ -193,21 +194,17 @@ class CSV_Checker:
 							row_None_list.append(index)
 							column_types[index].add(None)
 							continue
-						
+
 						if is_integer(value):
 							column_types[index].add(int)
 						elif is_float(value):
 							column_types[index].add(float)
 						else:
 							column_types[index].add(str)
-				
+
 					if row_None_list:
 						self.None_value_dict[i] = row_None_list
 			self.filter_cell_nonnumeric(column_types)
 		except Exception as e:
 			print(f"Error checking for delimiter inconsistencies: {e}")
 			sys.exit(1)
-			
-		
-
-

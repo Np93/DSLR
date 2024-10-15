@@ -7,6 +7,7 @@ import yaml
 from typing import List, Tuple, Dict
 from sklearn.preprocessing import LabelEncoder
 import math
+from dslr.utils import load_data
 
 def load_config(config_path: str) -> Dict:
     with open(config_path, 'r') as file:
@@ -32,7 +33,7 @@ def manual_std(data: List[float], mean: float) -> float:
     return math.sqrt(variance)
 
 def standardize_column(data: List[float], mean: float, std: float) -> List[float]:
-    if std == 0:  # Si l'écart-type est 0, on ne change pas les valeurs
+    if std == 0:
         return data
     return [(x - mean) / std for x in data]
 
@@ -55,12 +56,11 @@ class LogisticRegressionOVR_train:
         self.label_encoder = LabelEncoder()
 
     def preprocess_data(self, filepath: str) -> Tuple[np.ndarray, np.ndarray, List[str]]:
-        data = pd.read_csv(filepath)
+        data = load_data(filepath)
         X = data.iloc[:, 5:].select_dtypes(include=[np.number]).apply(
             lambda col: col.fillna(manual_median(col.dropna()))
         )
         y = self.label_encoder.fit_transform(data['Hogwarts House'])
-        # Standardiser manuellement chaque colonne
         for col in X.columns:
             column_data = X[col].tolist()
             mean = manual_mean(column_data)
@@ -97,8 +97,6 @@ class LogisticRegressionOVR_train:
         X = np.insert(X, 0, 1, axis=1)
         weights = np.random.rand(X.shape[1]) * 0.01
         cost_history = []
-        # initial_cost, _ = self.compute_cost(X, y, weights)
-        # print(f"Initial cost (premier coût) : {initial_cost}")
         for _ in range(self.n_iter):
             cost, gradient = self.compute_cost(X, y, weights)
             weights -= self.eta * gradient
@@ -106,10 +104,8 @@ class LogisticRegressionOVR_train:
             if np.isnan(cost):
                 break
             if self.early_stopping and self.early_stopping_check(cost_history, self.patience, self.tolerance):
-                print(f"Early stopping activated at iteration {i}")
+                print(f"Early stopping activated at iteration {_}")
                 break
-        # final_cost = cost_history[-1]
-        # print(f"Final cost (dernier coût) : {final_cost}")
         return weights
 
     def train_stochastic_gradient_descent(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -119,7 +115,7 @@ class LogisticRegressionOVR_train:
         cost_history = []
         for _ in range(self.n_iter):
             for i in range(m):
-                xi = X[i:i+1]  # Un seul exemple de données
+                xi = X[i:i+1]
                 yi = y[i:i+1]
                 cost, gradient = self.compute_cost(xi, yi, weights)
                 weights -= self.eta * gradient
@@ -127,7 +123,7 @@ class LogisticRegressionOVR_train:
                 if np.isnan(cost):
                     break
                 if self.early_stopping and self.early_stopping_check(cost_history, self.patience, self.tolerance):
-                    print(f"Early stopping activated at iteration {i}")
+                    print(f"Early stopping activated at iteration {_}")
                     break
         return weights
 
@@ -149,7 +145,7 @@ class LogisticRegressionOVR_train:
                 if np.isnan(cost):
                     break
                 if self.early_stopping and self.early_stopping_check(cost_history, self.patience, self.tolerance):
-                    print(f"Early stopping activated at iteration {i}")
+                    print(f"Early stopping activated at iteration {_}")
                     break
         return weights
 
@@ -178,16 +174,11 @@ if __name__ == "__main__":
     else:
         project_root = get_project_root()
         config_path = os.path.join(project_root, "config.yaml")
-        
-        # Charger la configuration
         config = load_config(config_path)
-        
-        # Initialiser et entraîner le modèle
         model = LogisticRegressionOVR_train(config)
         weights = model.fit(sys.argv[1])
-        
-        # Sauvegarder les poids appris dans un fichier JSON
+
         with open(os.path.join(project_root, 'trained_weights.json'), 'w') as f:
             json.dump(weights, f, indent=4)
-        
+
         print("Weights saved in 'trained_weights.json'.")

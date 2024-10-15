@@ -32,6 +32,13 @@ poetry run python3 dslr/scripts/scatter_plot.py
 
 poetry run python3 dslr/models/logreg_train.py data/dataset_train.csv
 poetry run python3 dslr/models/logreg_predict.py data/dataset_train.csv trained_weights.json
+
+pytest
+poetry run pytest tests
+poetry run pytest tests/models/test_logreg_train_predict.py
+
+test
+poetry run python3 test.py houses.csv data/dataset_test.csv
 ```
 
 ## Fonctionnalités
@@ -43,10 +50,10 @@ poetry run python3 dslr/models/logreg_predict.py data/dataset_train.csv trained_
 ## Contributeurs
 
 - Np93
-- ...
+- jsollet
 
 ## Licence
 
 ## Remerciements
 
-merci a j pour son aide et sont travail au projet
+merci a jsollet pour son aide et sont travail au projet!

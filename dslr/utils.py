@@ -162,13 +162,13 @@ def load_data(filepath) -> pd.DataFrame:
 	pd.DataFrame: DataFrame, les données chargées sous forme de DataFrame Pandas.
 	"""
 	checker = CSV_Checker(file_path=filepath, delimiter=',')
-	
+
 	checker.check_delimiter_inconsistency()
 	checker.check_unnamed_variables()
 	checker.analyze_data_type()
 	print(f"check error found {checker.error_found}")
 	checker.load_csv()
-	
+
 	df = checker.df
 	return df
 	#return pd.read_csv(filepath)

@@ -1,3 +1,7 @@
+No delimiter inconsistency detected, 19 columns
+No empty column headers detected.
+check error found False
+CSV file loaded successfully with 19 columns and 1600 rows
                 0             1           2          3                              4           5               6              7                 8                9          10                         11          12         13
 Feature      Index    Arithmancy   Astronomy  Herbology  Defense Against the Dark Arts  Divination  Muggle Studies  Ancient Runes  History of Magic  Transfiguration    Potions  Care of Magical Creatures      Charms     Flying
 Count         1600          1566        1568       1567                           1569        1561            1565           1565              1557             1566       1570                       1560        1600       1600
